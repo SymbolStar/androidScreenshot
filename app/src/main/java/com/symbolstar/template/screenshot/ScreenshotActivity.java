@@ -90,43 +90,6 @@ public class ScreenshotActivity extends AppCompatActivity {
         }).start();
     }
 
-    public void stopCap(View view) {
-//        stopProjection();
-                View rootView = this.getWindow().getDecorView().getRootView();
-        if (rootView != null) {
-            Bitmap screenshot = takeScreenshot(rootView);
-            try {
-                List<SurfaceView> mSurfaceViewList = getAllSurfaceViews(rootView);
-                if (screenshot != null && !mSurfaceViewList.isEmpty()) {
-                    Canvas canvas = new Canvas(screenshot);
-                    for (SurfaceView surfaceView : mSurfaceViewList) {
-                        getBitmapFromSurfaceView(surfaceView, new BitmapCallback() {
-                            @Override
-                            public void onSuccess(Bitmap bitmap) {
-                                Paint paint = new Paint();
-                                Xfermode xfermode = new PorterDuffXfermode(PorterDuff.Mode.DST_OVER);
-                                paint.setXfermode(xfermode);
-                                int[] locationArray = new int[2];
-                                surfaceView.getLocationInWindow(locationArray);
-                                canvas.drawBitmap(bitmap, locationArray[0], locationArray[1],
-                                        paint);
-
-                                if (screenshot == null) {
-                                    return;
-                                }
-                                mPreviewImage.setImageBitmap(screenshot);
-                                mPreviewContainer.setVisibility(View.VISIBLE);
-                            }
-                        });
-                    }
-                }
-            } catch (OutOfMemoryError error) {
-                error.printStackTrace();
-            }
-
-
-        }
-    }
 
     private void startProjection() {
         startActivityForResult(mMediaProjectionManager.createScreenCaptureIntent(), REQUEST_CODE);
@@ -168,7 +131,7 @@ public class ScreenshotActivity extends AppCompatActivity {
         mDisplay.getSize(size);
         mWidth = size.x;
         mHeight = size.y;
-        mImageReader = ImageReader.newInstance(mWidth, mHeight, PixelFormat.RGBA_8888, 2);
+        mImageReader = ImageReader.newInstance(mWidth, mHeight, PixelFormat.RGBA_8888, 10);
         mVirtualDisplay = mMediaProjection.createVirtualDisplay(SCREENCAP_NAME, mWidth, mHeight, mDensity,
                 VIRTUAL_DISPLAY_FLAGS, mImageReader.getSurface(), null, mHandler);
         mImageReader.setOnImageAvailableListener(new ImageAvailableListener(), mHandler);
@@ -193,7 +156,7 @@ public class ScreenshotActivity extends AppCompatActivity {
                     Bitmap bitmap = Bitmap.createBitmap(mWidth + rowPadding / pixelStride, mHeight, Bitmap.Config.ARGB_8888);
                     bitmap.copyPixelsFromBuffer(buffer);
 
-                    Log.e("sss---", "imageloader="+System.currentTimeMillis());
+                    Log.e("sss---", "imageloader=" + System.currentTimeMillis());
                     if (bitmap != null) {
                         new Handler(Looper.getMainLooper()).post(new Runnable() {
                             @Override
@@ -271,46 +234,8 @@ public class ScreenshotActivity extends AppCompatActivity {
         }
     }
 
-
     public void screenshot(View view) {
         showScreenshotAction(view);
-
-
-//        View rootView = this.getWindow().getDecorView().getRootView();
-//        if (rootView != null) {
-//            Bitmap screenshot = takeScreenshot(rootView);
-//            try {
-//                List<SurfaceView> mSurfaceViewList = getAllSurfaceViews(rootView);
-//                if (screenshot != null && !mSurfaceViewList.isEmpty()) {
-//                    Canvas canvas = new Canvas(screenshot);
-//                    for (SurfaceView surfaceView : mSurfaceViewList) {
-//                        getBitmapFromSurfaceView(surfaceView, new BitmapCallback() {
-//                            @Override
-//                            public void onSuccess(Bitmap bitmap) {
-//                                Paint paint = new Paint();
-//                                Xfermode xfermode = new PorterDuffXfermode(PorterDuff.Mode.DST_OVER);
-//                                paint.setXfermode(xfermode);
-//                                int[] locationArray = new int[2];
-//                                surfaceView.getLocationInWindow(locationArray);
-//                                canvas.drawBitmap(bitmap, locationArray[0], locationArray[1],
-//                                        paint);
-//
-//                                if (screenshot == null) {
-//                                    return;
-//                                }
-//                                mPreviewImage.setImageBitmap(screenshot);
-//                                mPreviewContainer.setVisibility(View.VISIBLE);
-//                            }
-//                        });
-//                    }
-//                }
-//            } catch (OutOfMemoryError error) {
-//                error.printStackTrace();
-//            }
-//
-//
-//        }
-
     }
 
     @Override
@@ -388,25 +313,55 @@ public class ScreenshotActivity extends AppCompatActivity {
     private void showScreenshotAction(View v) {
         PopupMenu popupMenu = new PopupMenu(v.getContext(), v);
         popupMenu.inflate(R.menu.menu_screenshot_action);
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
+        popupMenu.setOnMenuItemClickListener(item -> {
 
-                if (item.getItemId() == R.id.bar_normal) {
-
-                    return true;
-                }
-                if (item.getItemId() == R.id.bar_virtual) {
-                    startProjection();
-                    return true;
-                }
-
-                return false;
+            if (item.getItemId() == R.id.bar_normal) {
+                captureNormalView();
+                return true;
             }
+            if (item.getItemId() == R.id.bar_virtual) {
+                startProjection();
+                return true;
+            }
+
+            return false;
         });
 
         popupMenu.show();
     }
 
+    private void captureNormalView() {
+        View rootView = this.getWindow().getDecorView().getRootView();
+        if (rootView != null) {
+            Bitmap screenshot = takeScreenshot(rootView);
+            try {
+                List<SurfaceView> mSurfaceViewList = getAllSurfaceViews(rootView);
+                if (screenshot != null && !mSurfaceViewList.isEmpty()) {
+                    Canvas canvas = new Canvas(screenshot);
+                    for (SurfaceView surfaceView : mSurfaceViewList) {
+                        getBitmapFromSurfaceView(surfaceView, bitmap -> {
+                            Paint paint = new Paint();
+                            Xfermode xfermode = new PorterDuffXfermode(PorterDuff.Mode.DST_OVER);
+                            paint.setXfermode(xfermode);
+                            int[] locationArray = new int[2];
+                            surfaceView.getLocationInWindow(locationArray);
+                            canvas.drawBitmap(bitmap, locationArray[0], locationArray[1],
+                                    paint);
+
+                            if (screenshot == null) {
+                                return;
+                            }
+                            mPreviewImage.setImageBitmap(screenshot);
+                            mPreviewContainer.setVisibility(View.VISIBLE);
+                        });
+                    }
+                }
+            } catch (OutOfMemoryError error) {
+                error.printStackTrace();
+            }
+
+
+        }
+    }
 
 }

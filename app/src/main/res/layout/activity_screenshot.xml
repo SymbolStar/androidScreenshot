@@ -26,21 +26,15 @@
             android:text="Header"/>
         <ImageView
             android:id="@+id/iv_take_cap"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:layout_alignParentRight="true"
             android:layout_marginRight="16dp"
             android:src="@drawable/ic_jietu"
+            android:scaleType="center"
             android:onClick="screenshot"
             android:layout_centerVertical="true"/>
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toLeftOf="@id/iv_take_cap"
-            android:layout_marginRight="16dp"
-            android:src="@drawable/ic_jietu"
-            android:onClick="stopCap"
-            android:layout_centerVertical="true"/>
+
     </RelativeLayout>
 
     <RelativeLayout
