@@ -9,18 +9,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AndroidScreenshot">
+        <activity android:name=".screenshot.CacheViewActivity"
+            android:hardwareAccelerated="true"
+            android:theme="@style/Theme.Design.Light.NoActionBar"/>
         <activity
             android:name="com.symbolstar.MainActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".games.GamesActivity"
-            android:screenOrientation="landscape"/>
-        <activity android:name=".screenshot.ScreenshotActivity"
-            android:theme="@style/Theme.Design.Light.NoActionBar"/>
+        <activity
+            android:name=".games.GamesActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".screenshot.ScreenshotActivity"
+            android:theme="@style/Theme.Design.Light.NoActionBar" />
     </application>
 
 </manifest>

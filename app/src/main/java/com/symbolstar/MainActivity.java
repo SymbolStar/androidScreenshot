@@ -8,6 +8,7 @@ import android.view.View;
 
 import com.symbolstar.template.games.GamesActivity;
 import com.symbolstar.template.R;
+import com.symbolstar.template.screenshot.CacheViewActivity;
 import com.symbolstar.template.screenshot.ScreenshotActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,6 +26,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void launchScreenshot(View view) {
         startActivity(new Intent(this, ScreenshotActivity.class));
+    }
+
+    public void testCache(View view) {
+        startActivity(new Intent(this, CacheViewActivity.class));
     }
 
 }
